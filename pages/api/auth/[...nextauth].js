@@ -18,34 +18,32 @@ function parseJwt(token) {
 
 async function refreshAccessToken(token) {
   try {
-		const payload = {
-			refresh_token: token.refreshToken
-		}
+    const payload = {
+      refresh_token: token.refreshToken,
+    };
     const url = "http://localhost:8055/auth/refresh";
-
     const response = await fetch(url, {
       body: JSON.stringify(payload),
       headers: {
         "Content-Type": "application/json",
-        "Accept-Language": "en-US",
       },
       method: "POST",
     });
 
     const refreshedTokens = await response.json();
-
+    console.log({ refreshedTokens });
     if (!response.ok) {
       throw refreshedTokens;
     }
 
     return {
       ...token,
-      accessToken: refreshedTokens.access_token,
-      accessTokenExpires: Date.now() + refreshedTokens.expires,
-      refreshToken: refreshedTokens.refresh_token ?? token.refreshToken, // Fall back to old refresh token
+      accessToken: refreshedTokens.data.access_token,
+      accessTokenExpires: Date.now() + refreshedTokens.data.expires,
+      refreshToken: refreshedTokens.data.refresh_token ?? token.refreshToken, // Fall back to old refresh token
     };
   } catch (error) {
-    console.log(error);
+    console.log("error", error);
 
     return {
       ...token,
@@ -111,6 +109,7 @@ const options = {
   callbacks: {
     async jwt({ token, user, account }) {
       if (account && user) {
+				console.log({user});
         return {
           ...token,
           accessToken: user.access_token,
@@ -120,6 +119,7 @@ const options = {
           firstName: user.first_name,
           lastName: user.last_name,
           email: user.email,
+          id: user.id,
         };
       }
 
@@ -136,12 +136,13 @@ const options = {
       session.user.role = token.role;
       session.user.accessToken = token.accessToken;
       session.user.refreshToken = token.refreshToken;
-
+      session.user.id = token.id;
+      session.error = token.error;
       return session;
     },
   },
   pages: {
-    signIn: "/sign-in",
+    signIn: "/login",
   },
 };
 
