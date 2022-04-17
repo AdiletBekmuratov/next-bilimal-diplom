@@ -1,14 +1,8 @@
-import { signOut, useSession } from "next-auth/react";
-import Image from "next/image";
-import Link from "next/link";
-import React, { useState } from "react";
-import NavbarLink from "./NavbarLink";
+import useSessionCheck from "@/hooks/useSessionCheck";
+import React from "react";
 
 export default function Navbar({ title, navbarOpen, setNavbarOpen }) {
-  const { data: session, status } = useSession();
-  const handleNavbarClose = () => {
-    setNavbarOpen(false);
-  };
+  const { data: session, status } = useSessionCheck();
 
   return (
     <>

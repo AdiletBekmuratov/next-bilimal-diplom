@@ -109,7 +109,7 @@ const options = {
   callbacks: {
     async jwt({ token, user, account }) {
       if (account && user) {
-				console.log({user});
+        console.log({ user });
         return {
           ...token,
           accessToken: user.access_token,
@@ -119,6 +119,7 @@ const options = {
           firstName: user.first_name,
           lastName: user.last_name,
           email: user.email,
+          group: user.group,
           id: user.id,
         };
       }
@@ -136,6 +137,7 @@ const options = {
       session.user.role = token.role;
       session.user.accessToken = token.accessToken;
       session.user.refreshToken = token.refreshToken;
+      session.user.group = token.group;
       session.user.id = token.id;
       session.error = token.error;
       return session;

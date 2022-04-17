@@ -4,6 +4,7 @@ import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
+import toast from "react-hot-toast";
 import * as Yup from "yup";
 
 const LoginSchema = Yup.object().shape({
@@ -27,6 +28,7 @@ const Login = ({ csrfToken }) => {
 
     if (res?.error) {
       setError(true);
+      toast.error(res.error);
     } else {
       router.push("/");
     }
@@ -121,10 +123,8 @@ const Login = ({ csrfToken }) => {
         <div className="max-w-lg mx-auto text-center mt-12 mb-6">
           <p className="text-white">
             Еще нет аккаунта?{" "}
-            <Link href="/register"> 
-              <a className="font-bold hover:underline">
-                Зарегистрироваться
-              </a>
+            <Link href="/register">
+              <a className="font-bold hover:underline">Зарегистрироваться</a>
             </Link>
             .
           </p>

@@ -6,7 +6,7 @@ const useSessionCheck = () => {
 
   useEffect(() => {
     if (session?.error === "RefreshAccessTokenError") {
-      signOut(); // Force sign out
+      signOut({ redirect: true, callbackUrl: "/login" }); // Force sign out
     }
   }, [session]);
 
