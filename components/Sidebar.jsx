@@ -1,22 +1,21 @@
-import useSessionCheck from "@/hooks/useSessionCheck";
 import Logout from "@mui/icons-material/Logout";
 import Avatar from "@mui/material/Avatar";
 import Divider from "@mui/material/Divider";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
+import { signOut } from "next-auth/react";
+import Link from "next/link";
 import React from "react";
 import {
   AiOutlineCalendar,
-  AiTwotoneCalendar,
   AiOutlineHome,
   AiOutlineUser,
+  AiTwotoneCalendar,
 } from "react-icons/ai";
 import NavLink from "./NavLink";
-import { signOut } from "next-auth/react";
 
 const Sidebar = ({ navbarOpen, setNavbarOpen }) => {
-  useSessionCheck();
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
   const handleClick = (event) => {
@@ -75,7 +74,6 @@ const Sidebar = ({ navbarOpen, setNavbarOpen }) => {
             </NavLink>
           </div>
           {/* <div className="flex flex-col items-center w-full mt-2 border-t border-gray-300">
-       
         </div> */}
         </div>
         <a
@@ -122,9 +120,13 @@ const Sidebar = ({ navbarOpen, setNavbarOpen }) => {
         transformOrigin={{ horizontal: "right", vertical: "bottom" }}
         anchorOrigin={{ horizontal: "right", vertical: "top" }}
       >
-        <MenuItem>
-          <Avatar /> Мой профиль
-        </MenuItem>
+        <Link href="/profile">
+          <a>
+            <MenuItem>
+              <Avatar /> Мой профиль
+            </MenuItem>
+          </a>
+        </Link>
         <Divider />
         <MenuItem
           onClick={() => signOut({ redirect: true, callbackUrl: "/login" })}

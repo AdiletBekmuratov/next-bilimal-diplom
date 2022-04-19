@@ -16,8 +16,6 @@ import { getSession, useSession } from "next-auth/react";
 import React, { useState } from "react";
 import { useQuery } from "react-query";
 
-const currentDate = new Date();
-
 const getSchedules = async (groupId, token) => {
   const graphQLClient = new GraphQLClient(
     `${process.env.NEXT_PUBLIC_API_URL}/graphql`,
@@ -55,7 +53,7 @@ const Schedule = ({ schedules }) => {
   const [navbarOpen, setNavbarOpen] = useState(false);
   const { data, isLoading, error } = useQuery(
     "schedules",
-    () => getSchedules(session?.user?.group, session?.user?.accessToken),
+    () => getSchedules(session?.user?.groupId, session?.user?.accessToken),
     {
       initialData: schedules,
     }
@@ -79,7 +77,7 @@ const Schedule = ({ schedules }) => {
             <Paper>
               <Scheduler data={data} locale="ru-RU">
                 <ViewState
-                  defaultCurrentDate={currentDate}
+                  defaultCurrentDate={new Date()}
                   defaultCurrentViewName="Week"
                 />
                 <WeekView
@@ -103,7 +101,7 @@ const Schedule = ({ schedules }) => {
 export async function getServerSideProps(ctx) {
   const session = await getSession(ctx);
   const schedules = await getSchedules(
-    session?.user?.group,
+    session?.user?.groupId,
     session?.user?.accessToken
   );
   return { props: { schedules } };

@@ -39,7 +39,7 @@ const Login = ({ csrfToken }) => {
       <Head>
         <title>Вход в аккаунт</title>
       </Head>
-      <div className="flex flex-col flex-1 items-center justify-center p-5 bg-blue-400 overflow-auto">
+      <div className="flex flex-col flex-1 items-center justify-center p-5 bg-blue-400 overflow-auto min-h-screen">
         <div className="bg-white max-w-lg w-full mx-auto p-8 md:p-12 my-10 rounded-lg shadow-2xl">
           <section>
             <h3 className="font-bold text-2xl">Добро пожаловать!</h3>
