@@ -11,6 +11,9 @@
 			],
 			"@/hooks/*": [
 				"hooks/*"
+			],
+			"@/helpers/*": [
+				"helpers/*"
 			]
 		}
 	}

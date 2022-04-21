@@ -26,6 +26,10 @@
   .layout {
     @apply max-w-6xl mx-auto px-5 w-full;
   }
+
+  .dragNdrop {
+    @apply max-h-full max-w-full h-full border-2 border-dashed border-blue-600 !important;
+  }
 }
 
 /* Scrollbar Styling */

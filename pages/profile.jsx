@@ -1,12 +1,30 @@
 import MainWrapper from "@/components/MainWrapper";
-import { useSession } from "next-auth/react";
-import { BsFillGearFill } from "react-icons/bs";
-import React from "react";
-import { Tooltip } from "@mui/material";
+import { getCurrentUser, getGroupInfo } from "@/helpers/requests";
+import getImageURL from "@/helpers/getImageURL";
+import { getSession, useSession } from "next-auth/react";
 import Link from "next/link";
+import React from "react";
+import { BsFillGearFill } from "react-icons/bs";
+import { useQuery } from "react-query";
 
-const Profile = () => {
+const Profile = ({ currentUser, currentGroup }) => {
   const { data: session, status } = useSession();
+  const { data, isLoading, error } = useQuery(
+    "currentUser",
+    () => getCurrentUser(session?.user?.accessToken),
+    {
+      initialData: currentUser,
+    }
+  );
+
+  const { data: groupData } = useQuery(
+    "currentGroups",
+    () => getGroupInfo(session?.user?.accessToken, session?.user?.groupId),
+    {
+      initialData: currentGroup,
+    }
+  );
+
   return (
     <MainWrapper title={"Профиль"}>
       <section className="relative block h-72 md:h-96">
@@ -25,17 +43,21 @@ const Profile = () => {
       </section>
       <section className="relative py-16">
         <div className="container mx-auto px-4">
-          <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-6 shadow-xl rounded-lg -mt-64">
+          <div className="relative flex flex-col min-w-0 break-words bg-white w-full p-6 shadow-lg rounded-lg -mt-64">
             <div className="px-6">
               <div className="flex flex-wrap justify-center">
                 <div className="w-full lg:w-3/12 px-4 flex justify-center">
                   <div className="relative">
                     <img
-                      alt="..."
+                      alt="profile-image"
                       src={
-                        "https://images.unsplash.com/photo-1650217735382-17cc044e37be?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&h=800&q=80"
+                        getImageURL(
+                          data?.avatar,
+                          "fit=cover&width=150&height=150"
+                        ) ??
+                        "https://img.icons8.com/ios/150/150/user-male-circle.png"
                       }
-                      className="shadow-lg rounded-full h-auto align-middle border-none -mt-16"
+                      className="shadow-lg rounded-full h-auto align-middle border-none -mt-24 bg-white"
                       style={{ maxWidth: "150px" }}
                     />
                   </div>
@@ -53,19 +75,13 @@ const Profile = () => {
               </div>
               <div className="text-center mt-8">
                 <h3 className="text-base font-semibold leading-normal text-gray-600">
-                  {session?.user?.groupName}
+                  {groupData?.name}
                 </h3>
                 <h3 className="text-4xl font-semibold leading-normal mb-2 text-gray-800">
-                  {session?.user?.firstName + " " + session?.user?.lastName}
+                  {data?.first_name + " " + data?.last_name}
                 </h3>
                 <div className="text-sm leading-normal mb-2 text-gray-600 font-bold uppercase">
-                  {session?.user?.email}
-                </div>
-                <div className="mb-2 text-gray-700 mt-10">
-                  Solution Manager - Creative Tim Officer
-                </div>
-                <div className="mb-4 text-gray-700">
-                  University of Computer Science
+                  {data?.email}
                 </div>
               </div>
             </div>
@@ -75,5 +91,15 @@ const Profile = () => {
     </MainWrapper>
   );
 };
+
+export async function getServerSideProps(ctx) {
+  const session = await getSession(ctx);
+  const currentUser = await getCurrentUser(session?.user?.accessToken);
+  const currentGroup = await getGroupInfo(
+    session?.user?.accessToken,
+    session?.user?.groupId
+  );
+  return { props: { currentUser, currentGroup } };
+}
 
 export default Profile;

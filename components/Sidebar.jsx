@@ -1,5 +1,6 @@
 import Logout from "@mui/icons-material/Logout";
 import Avatar from "@mui/material/Avatar";
+import SettingsIcon from "@mui/icons-material/Settings";
 import Divider from "@mui/material/Divider";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import Menu from "@mui/material/Menu";
@@ -32,10 +33,7 @@ const Sidebar = ({ navbarOpen, setNavbarOpen }) => {
           navbarOpen ? "flex fixed md:static left-0 top-0 z-50" : "hidden"
         } md:flex`}
       >
-        <a
-          className="flex items-center justify-center w-full px-3 py-4"
-          href="#"
-        >
+        <a className="flex items-center justify-center w-full px-3 py-4 cursor-pointer">
           <svg
             className="w-8 h-8 fill-current"
             xmlns="http://www.w3.org/2000/svg"
@@ -77,8 +75,7 @@ const Sidebar = ({ navbarOpen, setNavbarOpen }) => {
         </div> */}
         </div>
         <a
-          className="flex items-center justify-center w-full h-16 mt-auto bg-gray-200 hover:bg-gray-300"
-          href="#"
+          className="flex items-center justify-center w-full h-16 mt-auto bg-gray-200 hover:bg-gray-300 cursor-pointer"
           onClick={handleClick}
         >
           <AiOutlineUser className="w-6 h-6 stroke-current" />
@@ -124,6 +121,16 @@ const Sidebar = ({ navbarOpen, setNavbarOpen }) => {
           <a>
             <MenuItem>
               <Avatar /> Мой профиль
+            </MenuItem>
+          </a>
+        </Link>
+        <Link href="/edit-profile">
+          <a>
+            <MenuItem>
+              <Avatar>
+                <SettingsIcon />
+              </Avatar>{" "}
+              Изменить
             </MenuItem>
           </a>
         </Link>

@@ -1,3 +1,4 @@
+import { getCurrentUser } from "@/helpers/requests";
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 
@@ -6,6 +7,9 @@ async function refreshAccessToken(token) {
     const payload = {
       refresh_token: token.refreshToken,
     };
+
+    console.log("Payload", { payload });
+
     const url = "http://localhost:8055/auth/refresh";
     const response = await fetch(url, {
       body: JSON.stringify(payload),
@@ -17,9 +21,6 @@ async function refreshAccessToken(token) {
 
     const refreshedTokens = await response.json();
     console.log("Refresh", { refreshedTokens });
-    if (!response.ok) {
-      throw refreshedTokens;
-    }
 
     return {
       ...token,
@@ -37,40 +38,10 @@ async function refreshAccessToken(token) {
   }
 }
 
-async function getCurrentUser(accessToken) {
-  try {
-    const res = await fetch(
-      `http://localhost:8055/users/me?fields=id,first_name,last_name,email,role,group.Group_id.name,group.Group_id.id`,
-      {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      }
-    );
-    const currentUser = await res.json();
-    return currentUser?.data;
-  } catch (error) {
-    throw new Error(error);
-  }
-}
-
 const options = {
   providers: [
     CredentialsProvider({
       name: "Credentials",
-      credentials: {
-        email: {
-          label: "Email",
-          type: "text",
-          placeholder: "Enter your email",
-        },
-        password: {
-          label: "Password",
-          type: "password",
-          placeholder: "Enter your password",
-        },
-      },
       async authorize(credentials) {
         try {
           const payload = {
@@ -89,53 +60,60 @@ const options = {
           });
 
           const user = await res.json();
-
-          if (user.data.access_token) {
+          if (!res.ok) {
+            if (user?.errors[0]?.extensions?.code === "INVALID_CREDENTIALS") {
+              throw new Error("Неверный Email или пароль");
+            }
+            throw new Error(user?.errors[0]?.message);
+          }
+          if (user?.data?.access_token) {
             return user.data;
           }
+
+          return null;
         } catch (error) {
           throw new Error(error);
         }
-        return null;
       },
     }),
   ],
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        return {
-          ...token,
-          accessToken: user.access_token,
-          accessTokenExpires: Date.now() + user.expires,
-          refreshToken: user.refresh_token,
-        };
+        token.accessToken = user.access_token;
+        token.accessTokenExpires = Date.now() + user.expires;
+        token.refreshToken = user.refresh_token;
       }
+
+      const userData = await getCurrentUser(token.accessToken);
+      console.log("NEXT_USER", { userData });
+      token.email = userData.email;
+      token.role = userData.role;
+      token.groupId = userData.group;
+      token.id = userData.id;
 
       const shouldRefreshTime = Math.round(
         token.accessTokenExpires - 5 * 60 * 1000 - Date.now()
       );
 
-      if (shouldRefreshTime > 0) {
-        return token;
-      }
+      console.log({ shouldRefreshTime });
 
-      return refreshAccessToken(token);
+      if (shouldRefreshTime > 0) {
+        return Promise.resolve(token);
+      }
+      token = refreshAccessToken(token);
+      return Promise.resolve(token);
     },
 
     async session({ session, token }) {
-      const user = await getCurrentUser(token.accessToken);
-      session.user.firstName = user.first_name;
-      session.user.lastName = user.last_name;
-      session.user.email = user.email;
-      session.user.role = user.role;
+      session.user.email = token.email;
+      session.user.role = token.role;
       session.user.accessToken = token.accessToken;
-      session.user.refreshToken = token.refreshToken;
       session.expires = token.accessTokenExpires;
-      session.user.groupId = user.group[0].Group_id.id;
-      session.user.groupName = user.group[0].Group_id.name;
-      session.user.id = user.id;
+      session.user.groupId = token.groupId;
+      session.user.id = token.id;
       session.error = token?.error;
-      return session;
+      return Promise.resolve(session);
     },
   },
   pages: {
