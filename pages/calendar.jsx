@@ -2,15 +2,15 @@ import Loader from "@/components/Loader";
 import MainWrapper from "@/components/MainWrapper";
 import { ViewState } from "@devexpress/dx-react-scheduler";
 import {
-	Appointments,
-	AppointmentTooltip,
-	DateNavigator,
-	DayView,
-	MonthView,
-	Scheduler,
-	Toolbar,
-	ViewSwitcher,
-	WeekView
+  Appointments,
+  AppointmentTooltip,
+  DateNavigator,
+  DayView,
+  MonthView,
+  Scheduler,
+  Toolbar,
+  ViewSwitcher,
+  WeekView,
 } from "@devexpress/dx-react-scheduler-material-ui";
 import Paper from "@mui/material/Paper";
 import { gql, GraphQLClient } from "graphql-request";
@@ -23,7 +23,7 @@ const getSchedules = async (groupId, token) => {
     `${process.env.NEXT_PUBLIC_API_URL}/graphql`,
     {
       headers: {
-        authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
       },
     }
   );

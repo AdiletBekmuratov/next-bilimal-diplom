@@ -13,6 +13,7 @@ import {
   AiOutlineHome,
   AiOutlineUser,
   AiTwotoneCalendar,
+	AiFillQuestionCircle
 } from "react-icons/ai";
 import NavLink from "./NavLink";
 
@@ -69,6 +70,14 @@ const Sidebar = ({ navbarOpen, setNavbarOpen }) => {
             >
               <AiOutlineCalendar className="w-6 h-6 stroke-current" />
               <span className="ml-2 text-sm font-medium">Календарь</span>
+            </NavLink>
+
+            <NavLink
+              className="flex items-center w-full h-12 px-3 mt-2 rounded hover:bg-gray-300"
+              href="/quizzes"
+            >
+              <AiFillQuestionCircle className="w-6 h-6 stroke-current" />
+              <span className="ml-2 text-sm font-medium">Тесты</span>
             </NavLink>
           </div>
           {/* <div className="flex flex-col items-center w-full mt-2 border-t border-gray-300">

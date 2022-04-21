@@ -133,7 +133,7 @@ const EditProfile = ({ currentUser }) => {
                       }`}
                     />
                     <button
-                      className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded shadow hover:shadow-md transition duration-200 disabled:bg-blue-100"
+                      className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded shadow hover:shadow-md transition duration-200 disabled:bg-blue-300 disabled:cursor-not-allowed"
                       type="button"
                       disabled={!file}
                       onClick={handleUploadFile}

@@ -1,4 +1,5 @@
 import axios from "axios";
+import { gql, GraphQLClient } from "graphql-request";
 
 export const getCurrentUser = async (accessToken = "") => {
   try {
@@ -50,6 +51,40 @@ export const updateGeneralInfo = async (accessToken, data) => {
     );
     const currentUser = res.data;
     return currentUser?.data;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
+export const getQuizzes = async (groupId, accessToken) => {
+  try {
+    const graphQLClient = new GraphQLClient(
+      `${process.env.NEXT_PUBLIC_API_URL}/graphql`,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+    const res = await graphQLClient.request(
+      gql`
+				query {
+					Quiz(filter:{groups:{Group_id: {id: {_eq: ${groupId}}}}}, sort: "-startDate"){
+						title
+						slug
+						description
+						startDate
+						endDate
+						groups{
+							Group_id{
+								id
+								name
+							}
+						}
+					}
+			}`
+    );
+    return res.Quiz;
   } catch (error) {
     throw new Error(error);
   }
