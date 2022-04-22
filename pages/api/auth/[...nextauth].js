@@ -10,7 +10,7 @@ async function refreshAccessToken(token) {
 
     console.log("Payload", { payload });
 
-    const url = "http://localhost:8055/auth/refresh";
+    const url = `${process.env.NEXT_PUBLIC_API_URL}/auth/refresh`;
     const response = await fetch(url, {
       body: JSON.stringify(payload),
       headers: {
@@ -20,13 +20,32 @@ async function refreshAccessToken(token) {
     });
 
     const refreshedTokens = await response.json();
+
     console.log("Refresh", { refreshedTokens });
 
-    return {
-      ...token,
-      accessToken: refreshedTokens.data.access_token,
+    if (refreshedTokens?.errors) {
+      console.log(refreshedTokens?.errors[0]);
+    }
+
+    const userData = await getCurrentUser(refreshedTokens.data.access_token);
+    const addition = {
+      email: userData.email,
+      role: userData.role,
+      groupId: userData.group,
+      id: userData.id,
+    };
+
+    let newToken = {
       accessTokenExpires: Date.now() + refreshedTokens.data.expires,
-      refreshToken: refreshedTokens.data.refresh_token ?? token.refreshToken, // Fall back to old refresh token
+      accessToken: refreshedTokens.data.access_token,
+      refreshToken: refreshedTokens.data.refresh_token,
+    };
+
+    console.log("NEW_TOKEN", { newToken });
+
+    return {
+      ...newToken,
+      ...addition,
     };
   } catch (error) {
     console.log("error", error);
@@ -51,23 +70,39 @@ const options = {
 
           console.log("Payload", { payload });
 
-          const res = await fetch("http://localhost:8055/auth/login", {
-            method: "POST",
-            body: JSON.stringify(payload),
-            headers: {
-              "Content-Type": "application/json",
-            },
-          });
+          const res = await fetch(
+            `${process.env.NEXT_PUBLIC_API_URL}/auth/login`,
+            {
+              method: "POST",
+              body: JSON.stringify(payload),
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
+          );
 
-          const user = await res.json();
+          const tokenData = await res.json();
           if (!res.ok) {
-            if (user?.errors[0]?.extensions?.code === "INVALID_CREDENTIALS") {
+            if (
+              tokenData?.errors[0]?.extensions?.code === "INVALID_CREDENTIALS"
+            ) {
               throw new Error("Неверный Email или пароль");
             }
-            throw new Error(user?.errors[0]?.message);
+            throw new Error(tokenData?.errors[0]?.message);
           }
-          if (user?.data?.access_token) {
-            return user.data;
+          if (tokenData?.data?.access_token) {
+            const userData = await getCurrentUser(
+              tokenData?.data?.access_token
+            );
+            console.log("NEXT_USER", { userData });
+            const addition = {
+              email: userData.email,
+              role: userData.role,
+              groupId: userData.group,
+              id: userData.id,
+            };
+
+            return { ...tokenData.data, ...addition };
           }
 
           return null;
@@ -83,14 +118,11 @@ const options = {
         token.accessToken = user.access_token;
         token.accessTokenExpires = Date.now() + user.expires;
         token.refreshToken = user.refresh_token;
+        token.email = user.email;
+        token.role = user.role;
+        token.groupId = user.groupId;
+        token.id = user.id;
       }
-
-      const userData = await getCurrentUser(token.accessToken);
-      console.log("NEXT_USER", { userData });
-      token.email = userData.email;
-      token.role = userData.role;
-      token.groupId = userData.group;
-      token.id = userData.id;
 
       const shouldRefreshTime = Math.round(
         token.accessTokenExpires - 5 * 60 * 1000 - Date.now()
@@ -98,11 +130,15 @@ const options = {
 
       console.log({ shouldRefreshTime });
 
+      console.log("BEFORE_REF", { token });
+
       if (shouldRefreshTime > 0) {
         return Promise.resolve(token);
       }
-      token = refreshAccessToken(token);
-      return Promise.resolve(token);
+      const newToken = await refreshAccessToken(token);
+      console.log("AFTER_REF", { newToken });
+
+      return Promise.resolve(newToken);
     },
 
     async session({ session, token }) {

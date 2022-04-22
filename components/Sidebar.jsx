@@ -13,7 +13,7 @@ import {
   AiOutlineHome,
   AiOutlineUser,
   AiTwotoneCalendar,
-	AiFillQuestionCircle
+  AiFillQuestionCircle,
 } from "react-icons/ai";
 import NavLink from "./NavLink";
 

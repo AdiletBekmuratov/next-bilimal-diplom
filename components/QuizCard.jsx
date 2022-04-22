@@ -1,3 +1,4 @@
+import getFormatDate from "@/helpers/getFormatDate";
 import {
   Button,
   Card,
@@ -10,7 +11,15 @@ import {
 import Link from "next/link";
 import React from "react";
 
-const QuizCard = ({ title, description, startDate, endDate, groups, slug }) => {
+const QuizCard = ({
+  title,
+  description,
+  startDate,
+  endDate,
+  groups,
+  slug,
+  questions,
+}) => {
   return (
     <div className="bg-white p-5 shadow-md flex flex-col space-y-4 justify-end h-full rounded-md">
       <div className="flex flex-col justify-between flex-grow">
@@ -22,10 +31,13 @@ const QuizCard = ({ title, description, startDate, endDate, groups, slug }) => {
         </Typography>
         <div>
           <Typography variant="body2" color="text.secondary">
-            Начало: {new Date(startDate).toLocaleString("kk-KZ")}
+            Кол-во вопросов: {questions}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            Конец: {new Date(endDate).toLocaleString("kk-KZ")}
+            Начало: {getFormatDate(startDate)}
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Конец: {getFormatDate(endDate)}
           </Typography>
         </div>
       </div>

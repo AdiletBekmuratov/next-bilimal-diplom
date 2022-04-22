@@ -17,9 +17,9 @@ const MainWrapper = ({ title, children }) => {
             setNavbarOpen={setNavbarOpen}
             title={title}
           />
-          <section className="flex flex-col flex-1 p-5 overflow-auto bg-gray-50">
+          <div className="flex flex-col flex-1 p-5 overflow-auto bg-gray-50 text-gray-700">
             {children}
-          </section>
+          </div>
         </div>
       </div>
     </>

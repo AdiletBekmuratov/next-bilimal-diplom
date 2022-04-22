@@ -56,7 +56,69 @@ export const updateGeneralInfo = async (accessToken, data) => {
   }
 };
 
+export const addNewScore = async (accessToken, data) => {
+  try {
+    const res = await axios.post(
+      `${process.env.NEXT_PUBLIC_API_URL}/items/QuizScores`,
+      data,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        withCredentials: true,
+      }
+    );
+    const result = res.data;
+    return result?.data;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
 export const getQuizzes = async (groupId, accessToken) => {
+  try {
+    const graphQLClient = new GraphQLClient(
+      `${process.env.NEXT_PUBLIC_API_URL}/graphql`,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+    const query = gql`
+      query{
+        Quiz(
+          filter: { groups: { Group_id: { id: { _eq: ${groupId} } } } },
+          sort: "-startDate"
+        ) {
+          id
+          title
+          description
+          startDate
+          endDate
+          slug
+          questions {
+            Question_id {
+              id
+            }
+          }
+          groups {
+            Group_id {
+              id
+              name
+            }
+          }
+        }
+      }
+    `;
+    const res = await graphQLClient.request(query);
+    return res.Quiz;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
+export const getQuizBySlug = async (slug, accessToken) => {
   try {
     const graphQLClient = new GraphQLClient(
       `${process.env.NEXT_PUBLIC_API_URL}/graphql`,
@@ -68,23 +130,30 @@ export const getQuizzes = async (groupId, accessToken) => {
     );
     const res = await graphQLClient.request(
       gql`
-				query {
-					Quiz(filter:{groups:{Group_id: {id: {_eq: ${groupId}}}}}, sort: "-startDate"){
-						title
+        query {
+          Quiz(filter: { slug: { _eq: "${slug}" } }) {
+            id
+            title
+            description
+            startDate
+            endDate
 						slug
-						description
-						startDate
-						endDate
-						groups{
-							Group_id{
-								id
-								name
-							}
-						}
-					}
-			}`
+            questions {
+              Question_id {
+                id
+                text
+                a
+                b
+                c
+                d
+                answer
+              }
+            }
+          }
+        }
+      `
     );
-    return res.Quiz;
+    return res.Quiz[0];
   } catch (error) {
     throw new Error(error);
   }
