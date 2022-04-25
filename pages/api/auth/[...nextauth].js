@@ -113,8 +113,8 @@ const options = {
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
-      if (user) {
+    async jwt({ token, user, account }) {
+      if (account && user) {
         token.accessToken = user.access_token;
         token.accessTokenExpires = Date.now() + user.expires;
         token.refreshToken = user.refresh_token;
@@ -133,17 +133,23 @@ const options = {
       console.log("BEFORE_REF", { token });
 
       if (shouldRefreshTime > 0) {
-        return Promise.resolve(token);
+        return token;
       }
-      const newToken = await refreshAccessToken(token);
+
+      return await refreshAccessToken(token);
       console.log("AFTER_REF", { newToken });
 
-      return Promise.resolve(newToken);
+      return newToken;
     },
 
     async session({ session, token }) {
       session.user.email = token.email;
-      session.user.role = token.role;
+      session.user.role =
+        token.role === process.env.D_ADMIN
+          ? "ADMIN"
+          : token.role === process.env.D_TEACHER
+          ? "TEACHER"
+          : "STUDENT";
       session.user.accessToken = token.accessToken;
       session.expires = token.accessTokenExpires;
       session.user.groupId = token.groupId;

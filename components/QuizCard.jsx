@@ -1,12 +1,8 @@
 import getFormatDate from "@/helpers/getFormatDate";
 import {
-  Button,
-  Card,
-  CardActions,
-  CardContent,
-  Chip,
-  Stack,
-  Typography,
+	Chip,
+	Stack,
+	Typography
 } from "@mui/material";
 import Link from "next/link";
 import React from "react";
@@ -19,9 +15,10 @@ const QuizCard = ({
   groups,
   slug,
   questions,
+  highScore,
 }) => {
   return (
-    <div className="bg-white p-5 shadow-md flex flex-col space-y-4 justify-end h-full rounded-md">
+    <div className="bg-white p-5 shadow-md flex flex-col space-y-4 justify-end h-full rounded-md w-full">
       <div className="flex flex-col justify-between flex-grow">
         <Typography gutterBottom variant="h5" component="div">
           {title}
@@ -32,6 +29,9 @@ const QuizCard = ({
         <div>
           <Typography variant="body2" color="text.secondary">
             Кол-во вопросов: {questions}
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Ваш высший балл: {highScore ?? 'Еще нет'}
           </Typography>
           <Typography variant="body2" color="text.secondary">
             Начало: {getFormatDate(startDate)}

@@ -5,7 +5,7 @@ import Divider from "@mui/material/Divider";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
-import { signOut } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import React from "react";
 import {
@@ -19,6 +19,7 @@ import NavLink from "./NavLink";
 
 const Sidebar = ({ navbarOpen, setNavbarOpen }) => {
   const [anchorEl, setAnchorEl] = React.useState(null);
+  const { data: session, status } = useSession();
   const open = Boolean(anchorEl);
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -58,7 +59,11 @@ const Sidebar = ({ navbarOpen, setNavbarOpen }) => {
 
             <NavLink
               className="flex items-center w-full h-12 px-3 mt-2 rounded hover:bg-gray-300"
-              href="/schedule"
+              href="/student/schedule"
+              condition={
+                session?.user?.role === "STUDENT" ||
+                session?.user?.role === "ADMIN"
+              }
             >
               <AiTwotoneCalendar className="w-6 h-6 stroke-current" />
               <span className="ml-2 text-sm font-medium">Расписание</span>
@@ -66,7 +71,11 @@ const Sidebar = ({ navbarOpen, setNavbarOpen }) => {
 
             <NavLink
               className="flex items-center w-full h-12 px-3 mt-2 rounded hover:bg-gray-300"
-              href="/calendar"
+              href="/student/calendar"
+              condition={
+                session?.user?.role === "STUDENT" ||
+                session?.user?.role === "ADMIN"
+              }
             >
               <AiOutlineCalendar className="w-6 h-6 stroke-current" />
               <span className="ml-2 text-sm font-medium">Календарь</span>
@@ -75,6 +84,10 @@ const Sidebar = ({ navbarOpen, setNavbarOpen }) => {
             <NavLink
               className="flex items-center w-full h-12 px-3 mt-2 rounded hover:bg-gray-300"
               href="/quizzes"
+              condition={
+                session?.user?.role === "STUDENT" ||
+                session?.user?.role === "ADMIN"
+              }
             >
               <AiFillQuestionCircle className="w-6 h-6 stroke-current" />
               <span className="ml-2 text-sm font-medium">Тесты</span>

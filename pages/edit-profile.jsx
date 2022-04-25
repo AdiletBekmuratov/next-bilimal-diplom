@@ -9,6 +9,7 @@ import { FileUploader } from "react-drag-drop-files";
 import toast from "react-hot-toast";
 import { useQuery } from "react-query";
 import * as Yup from "yup";
+import Head from "next/head";
 
 const fileTypes = ["JPG", "JPEG", "PNG"];
 
@@ -104,172 +105,177 @@ const EditProfile = ({ currentUser }) => {
   };
 
   return (
-    <MainWrapper title={"Редактировать Профиль"}>
-      {status === "loading" ? (
-        <div className="flex justify-center items-center flex-1">
-          <Loader />
-        </div>
-      ) : (
-        <>
-          <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-6 shadow-lg rounded-lg ">
-            <div className="p-6">
-              <div className="flex flex-col justify-center space-x-2">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="flex flex-col space-y-6">
-                    <h3>Фото профиля</h3>
-                    <FileUploader
-                      handleChange={handleChange}
-                      name="file"
-                      types={fileTypes}
-                      label="Загрузите или перетащите фото"
-                      hoverTitle="Перетащите сюда"
-                      classes="dragNdrop"
-                    />
-                    <img
-                      ref={imagePrevRef}
-                      alt="image upload"
-                      className={`h-96 w-full rounded-md object-cover ${
-                        file ? "flex-grow" : "hidden"
-                      }`}
-                    />
-                    <button
-                      className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded shadow hover:shadow-md transition duration-200 disabled:bg-blue-300 disabled:cursor-not-allowed"
-                      type="button"
-                      disabled={!file}
-                      onClick={handleUploadFile}
-                    >
-                      Загрузить
-                    </button>
-                  </div>
+    <>
+      <Head>
+        <title>Редактировать Профиль</title>
+      </Head>
+      <MainWrapper title={"Редактировать Профиль"}>
+        {status === "loading" ? (
+          <div className="flex justify-center items-center flex-1">
+            <Loader />
+          </div>
+        ) : (
+          <>
+            <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-6 shadow-lg rounded-lg ">
+              <div className="p-6">
+                <div className="flex flex-col justify-center space-x-2">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="flex flex-col space-y-6">
+                      <h3>Фото профиля</h3>
+                      <FileUploader
+                        handleChange={handleChange}
+                        name="file"
+                        types={fileTypes}
+                        label="Загрузите или перетащите фото"
+                        hoverTitle="Перетащите сюда"
+                        classes="dragNdrop"
+                      />
+                      <img
+                        ref={imagePrevRef}
+                        alt="image upload"
+                        className={`h-96 w-full rounded-md object-cover ${
+                          file ? "flex-grow" : "hidden"
+                        }`}
+                      />
+                      <button
+                        className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded shadow hover:shadow-md transition duration-200 disabled:bg-blue-300 disabled:cursor-not-allowed"
+                        type="button"
+                        disabled={!file}
+                        onClick={handleUploadFile}
+                      >
+                        Загрузить
+                      </button>
+                    </div>
 
-                  <Formik
-                    validationSchema={InfoSchema}
-                    initialValues={{
-                      first_name:
-                        status === "authenticated" ? data.first_name : "",
-                      last_name:
-                        status === "authenticated" ? data?.last_name : "",
-                    }}
-                    onSubmit={handleSubmitInfo}
-                  >
-                    {(props) => (
+                    <Formik
+                      validationSchema={InfoSchema}
+                      initialValues={{
+                        first_name:
+                          status === "authenticated" ? data.first_name : "",
+                        last_name:
+                          status === "authenticated" ? data?.last_name : "",
+                      }}
+                      onSubmit={handleSubmitInfo}
+                    >
+                      {(props) => (
+                        <Form className="flex flex-col space-y-6">
+                          <h3>Общая информация</h3>
+                          <div className="rounded">
+                            <label
+                              className="block text-gray-700 text-sm font-bold mb-2 ml-3"
+                              htmlFor="first_name"
+                            >
+                              Имя
+                            </label>
+                            <Field
+                              type="text"
+                              id="first_name"
+                              name="first_name"
+                              placeholder="Назипа"
+                              className="bg-gray-200 rounded w-full text-gray-700 focus:outline-none border-b-4 border-gray-300 focus:border-blue-600 transition duration-500 px-3 py-3"
+                            />
+                            <ErrorMessage
+                              component={"div"}
+                              className="text-red-500 pt-1 text-sm"
+                              name="first_name"
+                            />
+                          </div>
+                          <div className="rounded">
+                            <label
+                              className="block text-gray-700 text-sm font-bold mb-2 ml-3"
+                              htmlFor="last_name"
+                            >
+                              Фамилия
+                            </label>
+                            <Field
+                              type="text"
+                              id="last_name"
+                              name="last_name"
+                              placeholder="Ергалиева"
+                              className="bg-gray-200 rounded w-full text-gray-700 focus:outline-none border-b-4 border-gray-300 focus:border-blue-600 transition duration-500 px-3 py-3"
+                            />
+                            <ErrorMessage
+                              component={"div"}
+                              className="text-red-500 pt-1 text-sm"
+                              name="last_name"
+                            />
+                          </div>
+                          <button
+                            className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded shadow hover:shadow-md transition duration-200"
+                            type="submit"
+                          >
+                            Редактировать
+                          </button>
+                        </Form>
+                      )}
+                    </Formik>
+
+                    <Formik
+                      validationSchema={PasswordSchema}
+                      initialValues={{
+                        password: "",
+                        confirmPassword: "",
+                      }}
+                      onSubmit={handlePasswordSubmit}
+                    >
                       <Form className="flex flex-col space-y-6">
-                        <h3>Общая информация</h3>
+                        <h3>Безопасность</h3>
                         <div className="rounded">
                           <label
                             className="block text-gray-700 text-sm font-bold mb-2 ml-3"
-                            htmlFor="first_name"
+                            htmlFor="password"
                           >
-                            Имя
+                            Новый пароль
                           </label>
                           <Field
-                            type="text"
-                            id="first_name"
-                            name="first_name"
-                            placeholder="Назипа"
+                            type="password"
+                            id="password"
+                            name="password"
+                            placeholder="••••••"
                             className="bg-gray-200 rounded w-full text-gray-700 focus:outline-none border-b-4 border-gray-300 focus:border-blue-600 transition duration-500 px-3 py-3"
                           />
                           <ErrorMessage
                             component={"div"}
                             className="text-red-500 pt-1 text-sm"
-                            name="first_name"
+                            name="password"
                           />
                         </div>
                         <div className="rounded">
                           <label
                             className="block text-gray-700 text-sm font-bold mb-2 ml-3"
-                            htmlFor="last_name"
+                            htmlFor="confirmPassword"
                           >
-                            Фамилия
+                            Подтверждение нового пароля
                           </label>
                           <Field
-                            type="text"
-                            id="last_name"
-                            name="last_name"
-                            placeholder="Ергалиева"
+                            type="password"
+                            id="confirmPassword"
+                            name="confirmPassword"
+                            placeholder="••••••"
                             className="bg-gray-200 rounded w-full text-gray-700 focus:outline-none border-b-4 border-gray-300 focus:border-blue-600 transition duration-500 px-3 py-3"
                           />
                           <ErrorMessage
                             component={"div"}
                             className="text-red-500 pt-1 text-sm"
-                            name="last_name"
+                            name="confirmPassword"
                           />
                         </div>
                         <button
                           className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded shadow hover:shadow-md transition duration-200"
                           type="submit"
                         >
-                          Редактировать
+                          Изменить
                         </button>
                       </Form>
-                    )}
-                  </Formik>
-
-                  <Formik
-                    validationSchema={PasswordSchema}
-                    initialValues={{
-                      password: "",
-                      confirmPassword: "",
-                    }}
-                    onSubmit={handlePasswordSubmit}
-                  >
-                    <Form className="flex flex-col space-y-6">
-                      <h3>Безопасность</h3>
-                      <div className="rounded">
-                        <label
-                          className="block text-gray-700 text-sm font-bold mb-2 ml-3"
-                          htmlFor="password"
-                        >
-                          Новый пароль
-                        </label>
-                        <Field
-                          type="password"
-                          id="password"
-                          name="password"
-                          placeholder="••••••"
-                          className="bg-gray-200 rounded w-full text-gray-700 focus:outline-none border-b-4 border-gray-300 focus:border-blue-600 transition duration-500 px-3 py-3"
-                        />
-                        <ErrorMessage
-                          component={"div"}
-                          className="text-red-500 pt-1 text-sm"
-                          name="password"
-                        />
-                      </div>
-                      <div className="rounded">
-                        <label
-                          className="block text-gray-700 text-sm font-bold mb-2 ml-3"
-                          htmlFor="confirmPassword"
-                        >
-                          Подтверждение нового пароля
-                        </label>
-                        <Field
-                          type="password"
-                          id="confirmPassword"
-                          name="confirmPassword"
-                          placeholder="••••••"
-                          className="bg-gray-200 rounded w-full text-gray-700 focus:outline-none border-b-4 border-gray-300 focus:border-blue-600 transition duration-500 px-3 py-3"
-                        />
-                        <ErrorMessage
-                          component={"div"}
-                          className="text-red-500 pt-1 text-sm"
-                          name="confirmPassword"
-                        />
-                      </div>
-                      <button
-                        className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded shadow hover:shadow-md transition duration-200"
-                        type="submit"
-                      >
-                        Изменить
-                      </button>
-                    </Form>
-                  </Formik>
+                    </Formik>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        </>
-      )}
-    </MainWrapper>
+          </>
+        )}
+      </MainWrapper>
+    </>
   );
 };
 

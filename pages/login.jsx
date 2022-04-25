@@ -1,3 +1,4 @@
+import useAuth from "@/hooks/useAuth";
 import { ErrorMessage, Field, Form, Formik } from "formik";
 import { getCsrfToken, signIn } from "next-auth/react";
 import Head from "next/head";
@@ -16,6 +17,7 @@ const LoginSchema = Yup.object().shape({
 
 const Login = ({ csrfToken }) => {
   const router = useRouter();
+	useAuth()
   const [error, setError] = useState(false);
 
   const handleSubmit = async (values) => {

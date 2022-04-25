@@ -75,7 +75,7 @@ export const addNewScore = async (accessToken, data) => {
   }
 };
 
-export const getQuizzes = async (groupId, accessToken) => {
+export const getQuizzes = async (groupId, userId, accessToken) => {
   try {
     const graphQLClient = new GraphQLClient(
       `${process.env.NEXT_PUBLIC_API_URL}/graphql`,
@@ -86,9 +86,11 @@ export const getQuizzes = async (groupId, accessToken) => {
       }
     );
     const query = gql`
-      query{
+      query {
         Quiz(
-          filter: { groups: { Group_id: { id: { _eq: ${groupId} } } } },
+          filter: {
+            groups: { Group_id: { id: { _eq: ${groupId} } } }
+          }
           sort: "-startDate"
         ) {
           id
@@ -97,6 +99,12 @@ export const getQuizzes = async (groupId, accessToken) => {
           startDate
           endDate
           slug
+          scores(
+            filter: { user: { id: { _eq: "${userId}" } } }
+            sort: ["-score"]
+          ) {
+            score
+          }
           questions {
             Question_id {
               id
@@ -118,7 +126,7 @@ export const getQuizzes = async (groupId, accessToken) => {
   }
 };
 
-export const getQuizBySlug = async (slug, accessToken) => {
+export const getQuizBySlug = async (slug, userId, accessToken) => {
   try {
     const graphQLClient = new GraphQLClient(
       `${process.env.NEXT_PUBLIC_API_URL}/graphql`,
@@ -138,6 +146,13 @@ export const getQuizBySlug = async (slug, accessToken) => {
             startDate
             endDate
 						slug
+						scores(
+							filter: { user: { id: { _eq: "${userId}" } } }
+							sort: ["-date_created"]
+						) {
+							score
+							date_created
+						}
             questions {
               Question_id {
                 id

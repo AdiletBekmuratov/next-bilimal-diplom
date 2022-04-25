@@ -1,7 +1,16 @@
 import { useRouter } from "next/router";
 import Link from "next/link";
 
-export default function NavLink({ href, exact, children, ...props }) {
+export default function NavLink({
+  href,
+  exact,
+  condition = true,
+  children,
+  ...props
+}) {
+  if (!condition) {
+    return null;
+  }
   const { pathname } = useRouter();
   const isActive = exact ? pathname === href : pathname.startsWith(href);
 
