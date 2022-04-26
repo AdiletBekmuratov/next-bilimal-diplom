@@ -1,9 +1,10 @@
+import useAuth from "@/hooks/useAuth";
 import { useSession } from "next-auth/react";
 import { useEffect } from "react";
 
 const RefreshTokenHandler = (props) => {
   const { data: session } = useSession();
-
+  useAuth(true);
   useEffect(() => {
     if (!!session) {
       // We did set the token to be ready to refresh after 23 hours, here we set interval of 23 hours 30 minutes.

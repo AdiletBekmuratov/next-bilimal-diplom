@@ -79,7 +79,6 @@ const Calendar = ({ schedules }) => {
 
               <DayView displayName="День" startDayHour={8} endDayHour={18} />
               <WeekView displayName="Неделя" startDayHour={8} endDayHour={18} />
-              <MonthView displayName="Месяц" />
 
               <Toolbar />
               <DateNavigator />
@@ -104,7 +103,7 @@ export async function getServerSideProps(ctx) {
 }
 
 Calendar.auth = {
-	role: "STUDENT"
-}
+  role: "STUDENT",
+};
 
 export default Calendar;

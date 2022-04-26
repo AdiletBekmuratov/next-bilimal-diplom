@@ -4,7 +4,7 @@ import Sidebar from "./Sidebar";
 
 const MainWrapper = ({ title, children }) => {
   const [navbarOpen, setNavbarOpen] = useState(false);
-
+	
   return (
     <>
       <div className="flex w-screen h-screen">

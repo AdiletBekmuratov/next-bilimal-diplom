@@ -1,13 +1,9 @@
 import getFormatDate from "@/helpers/getFormatDate";
-import {
-	Chip,
-	Stack,
-	Typography
-} from "@mui/material";
+import { Chip, Stack, Typography } from "@mui/material";
 import Link from "next/link";
 import React from "react";
 
-const QuizCard = ({
+const QuizCardTeacher = ({
   title,
   description,
   startDate,
@@ -15,7 +11,6 @@ const QuizCard = ({
   groups,
   slug,
   questions,
-  highScore,
 }) => {
   return (
     <div className="bg-white p-5 shadow-md flex flex-col space-y-4 justify-end h-full rounded-md w-full">
@@ -29,9 +24,6 @@ const QuizCard = ({
         <div>
           <Typography variant="body2" color="text.secondary">
             Кол-во вопросов: {questions}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            Ваш высший балл: {highScore ?? 'Еще нет'}
           </Typography>
           <Typography variant="body2" color="text.secondary">
             Начало: {getFormatDate(startDate)}
@@ -52,19 +44,18 @@ const QuizCard = ({
           ))}
         </Stack>
       </div>
-      {new Date() > new Date(endDate) ? (
-        <button className="bg-blue-300 cursor-not-allowed text-white text-center font-bold py-2 rounded shadow-lg uppercase">
-          Закрыто
-        </button>
-      ) : (
-        <Link href={`/student/quizzes/${slug}`}>
-          <a className="bg-blue-600 hover:bg-blue-700 text-white text-center font-bold py-2 rounded shadow-lg hover:shadow-xl transition duration-200 uppercase">
-            Начать
-          </a>
-        </Link>
-      )}
+      <Link href={`teacher/quizzes/results/${slug}`}>
+        <a className="bg-blue-600 hover:bg-blue-700 text-white text-center font-bold py-2 rounded shadow-lg hover:shadow-xl transition duration-200 uppercase">
+          Просмотр результатов
+        </a>
+      </Link>
+      <Link href={`teacher/quizzes/edit/${slug}`}>
+        <a className="border-2 border-blue-600 hover:border-blue-700 text-white text-center font-bold py-2 rounded shadow-lg hover:shadow-xl transition duration-200 uppercase">
+          Изменить
+        </a>
+      </Link>
     </div>
   );
 };
 
-export default QuizCard;
+export default QuizCardTeacher;

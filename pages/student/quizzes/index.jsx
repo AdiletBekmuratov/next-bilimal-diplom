@@ -29,7 +29,7 @@ const Quizzes = ({ quizzes }) => {
         <title>Тесты</title>
       </Head>
       <MainWrapper title={"Тесты"}>
-        {false ? (
+        {isLoading ? (
           <div className="flex justify-center items-center flex-1 h-full">
             <Loader />
           </div>
@@ -45,7 +45,7 @@ const Quizzes = ({ quizzes }) => {
                 startDate={quiz.startDate}
                 endDate={quiz.endDate}
                 slug={quiz.slug}
-                questions={quiz?.questions?.length}
+                questions={quiz?.questions_func?.count}
                 highScore={quiz?.scores[0]?.score}
               />
             ))}

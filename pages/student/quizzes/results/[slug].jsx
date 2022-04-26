@@ -10,6 +10,7 @@ import React, { useState } from "react";
 const columns = [
   { field: "id", headerName: "№", width: 100 },
   { field: "score", headerName: "Балл", flex: 1 },
+	{ field: "question_count", headerName: "Кол-во вопросов", flex: 1 },
   {
     field: "date_created",
     headerName: "Время завершения",
@@ -52,9 +53,11 @@ export async function getServerSideProps(ctx) {
     session?.user?.id,
     session?.user?.accessToken
   );
+	console.log(quiz);
   const rows = quiz.scores.map((score, index) => ({
     id: index + 1,
     score: score.score,
+		question_count: quiz.questions.length,
     date_created: getFormatDate(score.date_created),
   }));
   return { props: { quiz, rows } };

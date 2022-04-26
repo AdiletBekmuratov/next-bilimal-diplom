@@ -27,7 +27,7 @@ const Quiz = ({ quiz }) => {
     };
 
     const data = await addNewScore(session?.user?.accessToken, payload);
-    router.push(`/quizzes/results/${quiz.slug}`);
+    router.push(`/student/quizzes/results/${quiz.slug}`);
   };
 
   return (

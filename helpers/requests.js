@@ -105,10 +105,46 @@ export const getQuizzes = async (groupId, userId, accessToken) => {
           ) {
             score
           }
-          questions {
-            Question_id {
+          questions_func{
+            count
+          }
+          groups {
+            Group_id {
               id
+              name
             }
+          }
+        }
+      }
+    `;
+    const res = await graphQLClient.request(query);
+    return res.Quiz;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
+export const getTeacherQuizzes = async (accessToken) => {
+  try {
+    const graphQLClient = new GraphQLClient(
+      `${process.env.NEXT_PUBLIC_API_URL}/graphql`,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+    const query = gql`
+      query QuizTeacher {
+        Quiz(filter: { user_created: { id: { _in: "$CURRENT_USER" } } }) {
+          id
+          title
+          description
+          startDate
+          endDate
+          slug
+          questions_func {
+            count
           }
           groups {
             Group_id {
@@ -169,6 +205,125 @@ export const getQuizBySlug = async (slug, userId, accessToken) => {
       `
     );
     return res.Quiz[0];
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
+export const getTeacherGroups = async (accessToken) => {
+  try {
+    const graphQLClient = new GraphQLClient(
+      `${process.env.NEXT_PUBLIC_API_URL}/graphql`,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+    const res = await graphQLClient.request(
+      gql`
+        query {
+          Group(
+            filter: {
+              teachers: { directus_users_id: { id: { _in: "$CURRENT_USER" } } }
+            }
+          ) {
+            id
+            name
+          }
+        }
+      `
+    );
+    return res.Group;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
+export const createSchedule = async (values, accessToken) => {
+  try {
+    const graphQLClient = new GraphQLClient(
+      `${process.env.NEXT_PUBLIC_API_URL}/graphql`,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+    const query = gql`
+      mutation CreateSchedule(
+        $date: Date!
+        $groups: [create_Schedule_Group_input]!
+        $subject: String!
+        $homework: String!
+      ) {
+        create_Schedule_item(
+          data: {
+            date: $date
+            groups: $groups
+            subject: $subject
+            homework: $homework
+          }
+        ) {
+          id
+          subject
+          homework
+          date
+          groups {
+            Group_id {
+              id
+              name
+            }
+          }
+        }
+      }
+    `;
+    const res = await graphQLClient.request(query, values);
+    return res.create_Schedule_item;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
+export const createQuiz = async (values, accessToken) => {
+  try {
+    const graphQLClient = new GraphQLClient(
+      `${process.env.NEXT_PUBLIC_API_URL}/graphql`,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+    const query = gql`
+      mutation CreateQuiz(
+        $slug: String!
+        $title: String!
+        $groups: [create_Quiz_Group_input]!
+        $questions: [create_Quiz_Question_input]!
+        $description: String!
+        $startDate: Date!
+        $endDate: Date!
+      ) {
+        create_Quiz_item(
+          data: {
+            slug: $slug
+            title: $title
+            description: $description
+            groups: $groups
+            questions: $questions
+            startDate: $startDate
+            endDate: $endDate
+          }
+        ) {
+          title
+          description
+          slug
+        }
+      }
+    `;
+    const res = await graphQLClient.request(query, values);
+    return res.create_Quiz_item;
   } catch (error) {
     throw new Error(error);
   }

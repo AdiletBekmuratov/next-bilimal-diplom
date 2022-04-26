@@ -18,7 +18,7 @@ export default function useAuth(shouldRedirect) {
       }
       setIsAuthenticated(false);
     } else if (session !== undefined) {
-      if (router.route === "/login" || router.route === '/register') {
+      if (router.route === "/login" || router.route === "/register") {
         router.replace("/");
       }
       setIsAuthenticated(true);

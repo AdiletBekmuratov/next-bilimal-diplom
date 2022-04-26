@@ -15,6 +15,8 @@ import {
   AiTwotoneCalendar,
   AiFillQuestionCircle,
 } from "react-icons/ai";
+import { FaSchool } from "react-icons/fa";
+import { BsPen } from "react-icons/bs";
 import NavLink from "./NavLink";
 
 const Sidebar = ({ navbarOpen, setNavbarOpen }) => {
@@ -36,15 +38,7 @@ const Sidebar = ({ navbarOpen, setNavbarOpen }) => {
         } md:flex`}
       >
         <a className="flex items-center justify-center w-full px-3 py-4 cursor-pointer">
-          <svg
-            className="w-8 h-8 fill-current"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-          >
-            <path d="M11 17a1 1 0 001.447.894l4-2A1 1 0 0017 15V9.236a1 1 0 00-1.447-.894l-4 2a1 1 0 00-.553.894V17zM15.211 6.276a1 1 0 000-1.788l-4.764-2.382a1 1 0 00-.894 0L4.789 4.488a1 1 0 000 1.788l4.764 2.382a1 1 0 00.894 0l4.764-2.382zM4.447 8.342A1 1 0 003 9.236V15a1 1 0 00.553.894l4 2A1 1 0 009 17v-5.764a1 1 0 00-.553-.894l-4-2z" />
-          </svg>
-          <span className="ml-2 text-sm font-bold">The App</span>
+          <FaSchool className="text-4xl" />
         </a>
         <div className="w-full px-2">
           <div className="flex flex-col items-center w-full border-t border-gray-300">
@@ -83,7 +77,7 @@ const Sidebar = ({ navbarOpen, setNavbarOpen }) => {
 
             <NavLink
               className="flex items-center w-full h-12 px-3 mt-2 rounded hover:bg-gray-300"
-              href="/quizzes"
+              href="/student/quizzes"
               condition={
                 session?.user?.role === "STUDENT" ||
                 session?.user?.role === "ADMIN"
@@ -91,6 +85,29 @@ const Sidebar = ({ navbarOpen, setNavbarOpen }) => {
             >
               <AiFillQuestionCircle className="w-6 h-6 stroke-current" />
               <span className="ml-2 text-sm font-medium">Тесты</span>
+            </NavLink>
+
+            <NavLink
+              className="flex items-center w-full h-12 px-3 mt-2 rounded hover:bg-gray-300"
+              href="/teacher/homework"
+              condition={
+                session?.user?.role === "TEACHER" ||
+                session?.user?.role === "ADMIN"
+              }
+            >
+              <BsPen className="w-6 h-6 stroke-current" />
+              <span className="ml-2 text-sm font-medium">Задать ДЗ</span>
+            </NavLink>
+            <NavLink
+              className="flex items-center w-full h-12 px-3 mt-2 rounded hover:bg-gray-300"
+              href="/teacher/quizzes/create"
+              condition={
+                session?.user?.role === "TEACHER" ||
+                session?.user?.role === "ADMIN"
+              }
+            >
+              <AiFillQuestionCircle className="w-6 h-6 stroke-current" />
+              <span className="ml-2 text-sm font-medium">Создать Тест</span>
             </NavLink>
           </div>
           {/* <div className="flex flex-col items-center w-full mt-2 border-t border-gray-300">

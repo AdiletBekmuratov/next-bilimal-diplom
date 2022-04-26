@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@date-io/luxon": "^2.13.1",
     "@devexpress/dx-react-core": "^3.0.2",
     "@devexpress/dx-react-scheduler": "^3.0.2",
     "@devexpress/dx-react-scheduler-material-ui": "^3.0.2",
@@ -27,6 +28,7 @@
     "react-hot-toast": "^2.2.0",
     "react-icons": "^4.3.1",
     "react-query": "^3.34.20",
+    "slugify": "^1.6.5",
     "yup": "^0.32.11"
   },
   "devDependencies": {
