@@ -46,7 +46,7 @@ const Quizzes = ({ quizzes }) => {
                 endDate={quiz.endDate}
                 slug={quiz.slug}
                 questions={quiz?.questions_func?.count}
-                highScore={quiz?.scores[0]?.score}
+                highScore={quiz?.scores?.at(0)?.score}
               />
             ))}
           </div>

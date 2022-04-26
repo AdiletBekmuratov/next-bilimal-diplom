@@ -1,16 +1,24 @@
 import MainWrapper from "@/components/MainWrapper";
 import getFormatDate from "@/helpers/getFormatDate";
-import { getQuizBySlug } from "@/helpers/requests";
+import { getQuizById } from "@/helpers/requests";
 import { Paper } from "@mui/material";
-import { DataGrid, ruRU, gridStringOrNumberComparator } from "@mui/x-data-grid";
+import { DataGrid, gridStringOrNumberComparator, ruRU } from "@mui/x-data-grid";
 import { getSession } from "next-auth/react";
 import Head from "next/head";
 import React, { useState } from "react";
 
 const columns = [
   { field: "id", headerName: "№", width: 100 },
-  { field: "score", headerName: "Балл", flex: 1 },
-  { field: "question_count", headerName: "Кол-во вопросов", flex: 1 },
+  { field: "email", headerName: "Email", flex: 1 },
+  { field: "fullname", headerName: "Студент", flex: 1 },
+  { field: "group", headerName: "Группа", flex: 1 },
+  { field: "score", headerName: "Балл", flex: 1, type: "number" },
+  {
+    field: "question_count",
+    headerName: "Кол-во вопросов",
+    flex: 1,
+    type: "number",
+  },
   {
     field: "date_created",
     headerName: "Время завершения",
@@ -20,7 +28,7 @@ const columns = [
   },
 ];
 
-const Results = ({ quiz, rows }) => {
+const TeacherResults = ({ quiz, rows }) => {
   const [pageSize, setPageSize] = useState(10);
 
   return (
@@ -48,15 +56,13 @@ const Results = ({ quiz, rows }) => {
 
 export async function getServerSideProps(ctx) {
   const session = await getSession(ctx);
-  const { slug } = ctx.query;
-  const quiz = await getQuizBySlug(
-    slug,
-    session?.user?.id,
-    session?.user?.accessToken
-  );
-  console.log(quiz);
+  const { id } = ctx.query;
+  const quiz = await getQuizById({ id }, session?.user?.accessToken);
   const rows = quiz.scores.map((score, index) => ({
     id: index + 1,
+    email: score.user.email,
+    fullname: score.user.first_name + " " + score.user.last_name,
+    group: score.user.group.name,
     score: score.score,
     question_count: quiz.questions.length,
     date_created: getFormatDate(score.date_created),
@@ -64,4 +70,4 @@ export async function getServerSideProps(ctx) {
   return { props: { quiz, rows } };
 }
 
-export default Results;
+export default TeacherResults;

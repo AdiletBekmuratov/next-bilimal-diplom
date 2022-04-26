@@ -1,9 +1,5 @@
 import getFormatDate from "@/helpers/getFormatDate";
-import {
-	Chip,
-	Stack,
-	Typography
-} from "@mui/material";
+import { Chip, Stack, Typography } from "@mui/material";
 import Link from "next/link";
 import React from "react";
 
@@ -31,7 +27,7 @@ const QuizCard = ({
             Кол-во вопросов: {questions}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            Ваш высший балл: {highScore ?? 'Еще нет'}
+            Ваш высший балл: {highScore ?? "Еще нет"}
           </Typography>
           <Typography variant="body2" color="text.secondary">
             Начало: {getFormatDate(startDate)}
@@ -53,16 +49,21 @@ const QuizCard = ({
         </Stack>
       </div>
       {new Date() > new Date(endDate) ? (
-        <button className="bg-blue-300 cursor-not-allowed text-white text-center font-bold py-2 rounded shadow-lg uppercase">
+        <button className="bg-blue-300 cursor-not-allowed text-white text-center font-bold py-2 rounded shadow-md uppercase">
           Закрыто
         </button>
       ) : (
         <Link href={`/student/quizzes/${slug}`}>
-          <a className="bg-blue-600 hover:bg-blue-700 text-white text-center font-bold py-2 rounded shadow-lg hover:shadow-xl transition duration-200 uppercase">
+          <a className="bg-blue-600 hover:bg-blue-700 text-white text-center font-bold py-2 rounded shadow-md hover:shadow-lg transition duration-200 uppercase">
             Начать
           </a>
         </Link>
       )}
+      <Link href={`/student/quizzes/results/${slug}`}>
+        <a className="border-2 border-blue-600 hover:border-blue-700 text-blue-600 text-center font-bold py-2 rounded shadow-md hover:shadow-lg transition duration-200 uppercase">
+          Просмотр результатов
+        </a>
+      </Link>
     </div>
   );
 };

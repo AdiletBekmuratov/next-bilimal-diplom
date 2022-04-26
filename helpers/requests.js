@@ -328,3 +328,55 @@ export const createQuiz = async (values, accessToken) => {
     throw new Error(error);
   }
 };
+
+export const getQuizById = async (values, accessToken) => {
+  try {
+    const graphQLClient = new GraphQLClient(
+      `${process.env.NEXT_PUBLIC_API_URL}/graphql`,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+    const query = gql`
+      query QuizByID($id: ID!) {
+        Quiz_by_id(id: $id) {
+          id
+          title
+          description
+          startDate
+          endDate
+          slug
+          scores(sort: ["-score"], limit: 1) {
+            score
+            date_created
+            user {
+              email
+              first_name
+              last_name
+              group {
+                name
+              }
+            }
+          }
+          questions {
+            Question_id {
+              id
+            }
+          }
+          groups {
+            Group_id {
+              id
+              name
+            }
+          }
+        }
+      }
+    `;
+    const res = await graphQLClient.request(query, values);
+    return res.Quiz_by_id;
+  } catch (error) {
+    throw new Error(error);
+  }
+};

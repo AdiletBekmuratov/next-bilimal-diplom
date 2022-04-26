@@ -1,4 +1,5 @@
 import MainWrapper from "@/components/MainWrapper";
+import WeatherComponent from "@/components/Weather/WeatherComponent";
 import { useSession } from "next-auth/react";
 import Head from "next/head";
 
@@ -11,7 +12,7 @@ export default function Home() {
         <title>Главная</title>
       </Head>
       <MainWrapper title={"Главная"}>
-        <h1>Signed in as {session?.user?.role}</h1>
+        <WeatherComponent />
       </MainWrapper>
     </>
   );

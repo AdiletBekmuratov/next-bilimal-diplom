@@ -4,6 +4,7 @@ import Link from "next/link";
 import React from "react";
 
 const QuizCardTeacher = ({
+  id,
   title,
   description,
   startDate,
@@ -44,13 +45,13 @@ const QuizCardTeacher = ({
           ))}
         </Stack>
       </div>
-      <Link href={`teacher/quizzes/results/${slug}`}>
-        <a className="bg-blue-600 hover:bg-blue-700 text-white text-center font-bold py-2 rounded shadow-lg hover:shadow-xl transition duration-200 uppercase">
+      <Link href={`/teacher/quizzes/results/${slug}?id=${id}`}>
+        <a className="bg-blue-600 hover:bg-blue-700 text-white text-center font-bold py-2 rounded shadow-md hover:shadow-lg transition duration-200 uppercase">
           Просмотр результатов
         </a>
       </Link>
-      <Link href={`teacher/quizzes/edit/${slug}`}>
-        <a className="border-2 border-blue-600 hover:border-blue-700 text-white text-center font-bold py-2 rounded shadow-lg hover:shadow-xl transition duration-200 uppercase">
+      <Link href={`/teacher/quizzes/edit/${slug}?id=${id}`}>
+        <a className="border-2 border-blue-600 hover:border-blue-700 text-blue-600 text-center font-bold py-2 rounded shadow-md hover:shadow-lg transition duration-200 uppercase">
           Изменить
         </a>
       </Link>

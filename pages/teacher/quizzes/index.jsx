@@ -2,12 +2,15 @@ import Loader from "@/components/Loader";
 import MainWrapper from "@/components/MainWrapper";
 import QuizCardTeacher from "@/components/QuizCardTeacher";
 import { getTeacherQuizzes } from "@/helpers/requests";
+import { Fab, Tooltip } from "@mui/material";
+import Link from "next/link";
+import { IoIosAdd } from "react-icons/io";
 import { getSession, useSession } from "next-auth/react";
 import Head from "next/head";
 import React from "react";
 import { useQuery } from "react-query";
 
-const TeacherQuizzes = () => {
+const TeacherQuizzes = ({ quizzes }) => {
   const { data: session, status } = useSession();
 
   const { data, isLoading, error } = useQuery(
@@ -29,21 +32,33 @@ const TeacherQuizzes = () => {
             <Loader />
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
-            {data.map((quiz) => (
-              <QuizCardTeacher
-                key={quiz.id}
-                id={quiz.id}
-                title={quiz.title}
-                description={quiz.description}
-                groups={quiz.groups}
-                startDate={quiz.startDate}
-                endDate={quiz.endDate}
-                slug={quiz.slug}
-                questions={quiz?.questions_func?.count}
-              />
-            ))}
-          </div>
+          <>
+            <div className="absolute right-10 bottom-10">
+              <Link href={"/teacher/quizzes/create"}>
+                <Tooltip arrow title="Создать Тест">
+                  <Fab component={"a"} color="primary" aria-label="add">
+                    <IoIosAdd size={28} />
+                  </Fab>
+                </Tooltip>
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
+              {data.map((quiz) => (
+                <QuizCardTeacher
+                  key={quiz.id}
+                  id={quiz.id}
+                  title={quiz.title}
+                  description={quiz.description}
+                  groups={quiz.groups}
+                  startDate={quiz.startDate}
+                  endDate={quiz.endDate}
+                  slug={quiz.slug}
+                  questions={quiz?.questions_func?.count}
+                />
+              ))}
+            </div>
+          </>
         )}
       </MainWrapper>
     </>
