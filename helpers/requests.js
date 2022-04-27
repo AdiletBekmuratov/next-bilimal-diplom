@@ -363,6 +363,12 @@ export const getQuizById = async (values, accessToken) => {
           questions {
             Question_id {
               id
+              text
+              a
+              b
+              c
+              d
+              answer
             }
           }
           groups {
@@ -376,6 +382,76 @@ export const getQuizById = async (values, accessToken) => {
     `;
     const res = await graphQLClient.request(query, values);
     return res.Quiz_by_id;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
+export const updateQuizById = async (values, accessToken) => {
+  try {
+    const graphQLClient = new GraphQLClient(
+      `${process.env.NEXT_PUBLIC_API_URL}/graphql`,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+    const query = gql`
+      mutation UpdateQuiz(
+        $id: ID!
+        $title: String
+        $groups: [update_Quiz_Group_input]
+        $questions: [update_Quiz_Question_input]
+        $description: String
+        $startDate: Date
+        $endDate: Date
+      ) {
+        update_Quiz_item(
+          id: $id
+          data: {
+            title: $title
+            description: $description
+            groups: $groups
+            questions: $questions
+            startDate: $startDate
+            endDate: $endDate
+          }
+        ) {
+          title
+          description
+          slug
+        }
+      }
+    `;
+    const res = await graphQLClient.request(query, values);
+    console.log("Update", { res });
+    return res.update_Quiz_item;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
+export const deleteQuestionsByIds = async (values, accessToken) => {
+  try {
+    const graphQLClient = new GraphQLClient(
+      `${process.env.NEXT_PUBLIC_API_URL}/graphql`,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+    const query = gql`
+      mutation DeleteQuizQuestions($ids: [ID!]!) {
+        delete_Question_items(ids: $ids) {
+          ids
+        }
+      }
+    `;
+    const res = await graphQLClient.request(query, values);
+    console.log("Delete", { res });
+    return res.delete_Question_items;
   } catch (error) {
     throw new Error(error);
   }

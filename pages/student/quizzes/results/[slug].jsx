@@ -64,4 +64,8 @@ export async function getServerSideProps(ctx) {
   return { props: { quiz, rows } };
 }
 
+Results.auth = {
+	role: 'STUDENT'
+}
+
 export default Results;

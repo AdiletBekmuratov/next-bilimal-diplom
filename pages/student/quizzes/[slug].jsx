@@ -121,4 +121,8 @@ export async function getServerSideProps(ctx) {
   return { props: { quiz } };
 }
 
+Quiz.auth = {
+  role: "STUDENT",
+};
+
 export default Quiz;

@@ -1,7 +1,12 @@
 import FormField from "@/components/FormField";
 import MainWrapper from "@/components/MainWrapper";
 import { toIsoString } from "@/helpers/getFormatDate";
-import { createQuiz, getTeacherGroups } from "@/helpers/requests";
+import {
+  deleteQuestionsByIds,
+  getQuizById,
+  getTeacherGroups,
+  updateQuizById,
+} from "@/helpers/requests";
 import {
   Button,
   Chip,
@@ -18,16 +23,17 @@ import { Box } from "@mui/system";
 import { AdapterLuxon } from "@mui/x-date-pickers/AdapterLuxon";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { FieldArray, Form, Formik } from "formik";
+import { Field, FieldArray, Form, Formik } from "formik";
 import { getSession, useSession } from "next-auth/react";
+import { useRouter } from "next/router";
 import React from "react";
 import toast from "react-hot-toast";
 import { AiFillDelete } from "react-icons/ai";
 import { IoIosAdd } from "react-icons/io";
-import slugify from "slugify";
 import * as Yup from "yup";
 
 const QuestionsSchema = Yup.object().shape({
+  id: Yup.string(),
   text: Yup.string().required("Обязательное поле для заполнения"),
   a: Yup.string().required("Обязательное поле для заполнения"),
   b: Yup.string().required("Обязательное поле для заполнения"),
@@ -37,6 +43,7 @@ const QuestionsSchema = Yup.object().shape({
 });
 
 const QuizSchema = Yup.object().shape({
+  deleteIds: Yup.array(),
   title: Yup.string().required("Обязательное поле для заполнения"),
   description: Yup.string().required("Обязательное поле для заполнения"),
   startDate: Yup.string()
@@ -51,35 +58,49 @@ const QuizSchema = Yup.object().shape({
   questions: Yup.array().of(QuestionsSchema),
 });
 
-const CreateQuiz = ({ groups }) => {
+const EditQuiz = ({ groups, quiz }) => {
   const { data: session } = useSession();
+  const router = useRouter();
 
   const handleSubmit = async (values, { resetForm }) => {
+    if (values.deleteIds.length >= values.questions.length) {
+      toast.error("Тест должен содержать как минимум один вопрос");
+      return;
+    }
+
+    const filteredQuestions = values.questions.filter(
+      (val) => !values.deleteIds.includes(val.id)
+    );
+
     const data = {
+      id: quiz.id,
       title: values.title,
-      slug: slugify(`${values.title}-${Math.random()}`, {
-        strict: true,
-        lower: true,
-      }),
       description: values.description,
       startDate: toIsoString(new Date(values.startDate)),
       endDate: toIsoString(new Date(values.endDate)),
       groups: values.groups.map((group) => ({ Group_id: { id: group } })),
-      questions: values.questions.map((question) => ({
-        Question_id: question,
+      questions: filteredQuestions.map((question) => ({
+        Question_id: Object.keys(question)
+          .filter((key) => key !== "new")
+          .reduce((obj, key) => {
+            obj[key] = question[key];
+            return obj;
+          }, {}),
       })),
     };
 
-    await toast
-      .promise(createQuiz(data, session?.user?.accessToken), {
+    const updateData = await toast.promise(
+      updateQuizById(data, session?.user?.accessToken),
+      {
         success: "Данные успешно обновлены!",
         loading: "Загрузка",
         error: (err) => `Произошла ошибка: ${err.toString()}`,
-      })
-      .then(() => {
-        resetForm();
-      });
+      }
+    );
+
+    router.reload();
   };
+
   return (
     <MainWrapper title="Создание теста">
       <LocalizationProvider dateAdapter={AdapterLuxon} locale="ru">
@@ -87,23 +108,7 @@ const CreateQuiz = ({ groups }) => {
           <Formik
             validationSchema={QuizSchema}
             onSubmit={handleSubmit}
-            initialValues={{
-              groups: [],
-              title: "",
-              description: "",
-              startDate: new Date(),
-              endDate: new Date(),
-              questions: [
-                {
-                  text: "",
-                  a: "",
-                  b: "",
-                  c: "",
-                  d: "",
-                  answer: "a",
-                },
-              ],
-            }}
+            initialValues={quiz}
           >
             {({ values, setFieldValue, touched, errors, handleChange }) => (
               <Form className="flex flex-col space-y-6 w-full">
@@ -226,6 +231,7 @@ const CreateQuiz = ({ groups }) => {
                                 c: "",
                                 d: "",
                                 answer: "a",
+                                new: true,
                               })
                             }
                             color="primary"
@@ -246,22 +252,41 @@ const CreateQuiz = ({ groups }) => {
                             <div
                               className={`grid grid-cols-1 gap-6 ${
                                 index !== 0 && "border-t border-gray-300 pt-4"
+                              } ${
+                                values.deleteIds.includes(
+                                  values?.questions?.at(index)?.id
+                                ) && "bg-red-200"
                               }`}
                               key={index}
                             >
                               <div className="flex justify-between items-center">
                                 <h4>{index + 1})</h4>
-                                {index !== 0 && (
-                                  <div className="text-right">
+                                <div className="text-right">
+                                  {values?.questions?.at(index)?.new ? (
                                     <button
-                                      type="button"
-                                      className="p-2 rounded-full bg-red-500 hover:opacity-90 text-xl text-white"
+                                      className="p-2 flex rounded-full bg-red-500 hover:opacity-90 text-xl text-white cursor-pointer"
                                       onClick={() => arrayHelper.remove(index)}
                                     >
                                       <AiFillDelete />
                                     </button>
-                                  </div>
-                                )}
+                                  ) : (
+                                    <>
+                                      <Field
+                                        id={`checkbox-${index}`}
+                                        type="checkbox"
+                                        className="hidden"
+                                        name="deleteIds"
+                                        value={values?.questions?.at(index)?.id}
+                                      />
+                                      <label
+                                        htmlFor={`checkbox-${index}`}
+                                        className="p-2 flex rounded-full bg-red-500 hover:opacity-90 text-xl text-white cursor-pointer"
+                                      >
+                                        <AiFillDelete />
+                                      </label>
+                                    </>
+                                  )}
+                                </div>
                               </div>
 
                               <FormField
@@ -350,12 +375,33 @@ const CreateQuiz = ({ groups }) => {
 
 export async function getServerSideProps(ctx) {
   const session = await getSession(ctx);
+  const { id } = ctx.query;
+  const quizData = await getQuizById({ id }, session?.user?.accessToken);
+  const quiz = {
+    deleteIds: [],
+    id: quizData.id,
+    title: quizData.title,
+    description: quizData.description,
+    startDate: quizData.startDate,
+    endDate: quizData.endDate,
+    groups: quizData.groups.map((group) => group.Group_id.id),
+    questions: quizData.questions.map(({ Question_id }) => ({
+      id: Question_id.id,
+      text: Question_id.text,
+      a: Question_id.a,
+      b: Question_id.b,
+      c: Question_id.c,
+      d: Question_id.d,
+      answer: Question_id.answer,
+      new: false,
+    })),
+  };
   const groups = await getTeacherGroups(session?.user?.accessToken);
-  return { props: { groups } };
+  return { props: { groups, quiz } };
 }
 
-CreateQuiz.auth = {
+EditQuiz.auth = {
   role: "TEACHER",
 };
 
-export default CreateQuiz;
+export default EditQuiz;
