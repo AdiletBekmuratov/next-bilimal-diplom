@@ -14,14 +14,16 @@ const QuizCard = ({
   highScore,
 }) => {
   return (
-    <div className="bg-white p-5 shadow-md flex flex-col space-y-4 justify-end h-full rounded-md w-full">
+    <div className="bg-white p-5 shadow-md flex flex-col space-y-4 justify-end rounded-md w-full">
       <div className="flex flex-col justify-between flex-grow">
-        <Typography gutterBottom variant="h5" component="div">
-          {title}
-        </Typography>
-        <Typography variant="body1" color="text.secondary">
-          {description}
-        </Typography>
+        <div>
+          <Typography gutterBottom variant="h5" component="div">
+            {title}
+          </Typography>
+          <Typography variant="body1" color="text.secondary">
+            {description}
+          </Typography>
+        </div>
         <div>
           <Typography variant="body2" color="text.secondary">
             Кол-во вопросов: {questions}

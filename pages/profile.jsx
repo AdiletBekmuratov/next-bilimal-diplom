@@ -108,4 +108,8 @@ export async function getServerSideProps(ctx) {
   return { props: { currentUser, currentGroup } };
 }
 
+Profile.auth = {
+  auth: "required",
+};
+
 export default Profile;

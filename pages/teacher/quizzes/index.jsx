@@ -1,17 +1,23 @@
 import Loader from "@/components/Loader";
 import MainWrapper from "@/components/MainWrapper";
 import QuizCardTeacher from "@/components/QuizCardTeacher";
-import { getTeacherQuizzes } from "@/helpers/requests";
+import { deleteQuizById, getTeacherQuizzes } from "@/helpers/requests";
 import { Fab, Tooltip } from "@mui/material";
 import Link from "next/link";
 import { IoIosAdd } from "react-icons/io";
 import { getSession, useSession } from "next-auth/react";
 import Head from "next/head";
-import React from "react";
+import React, { useState } from "react";
 import { useQuery } from "react-query";
+import AlertDialog from "@/components/AlertDialog";
+import { useRouter } from "next/router";
+import toast from "react-hot-toast";
 
 const TeacherQuizzes = ({ quizzes }) => {
   const { data: session, status } = useSession();
+  const [open, setOpen] = useState(false);
+  const [tempId, setTempId] = useState(0);
+  const router = useRouter();
 
   const { data, isLoading, error } = useQuery(
     "quizzes",
@@ -21,11 +27,34 @@ const TeacherQuizzes = ({ quizzes }) => {
     }
   );
 
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  const handleSubmit = async () => {
+    const res = await toast.promise(
+      deleteQuizById({ id: tempId }, session?.user?.accessToken),
+      {
+        success: "Тест успешно удалён!",
+        loading: "Загрузка",
+        error: (err) => `Произошла ошибка: ${err.toString()}`,
+      }
+    );
+    router.reload();
+  };
+
   return (
     <>
       <Head>
         <title>Тесты</title>
       </Head>
+      <AlertDialog
+        open={open}
+        handleClose={handleClose}
+        onAgree={handleSubmit}
+        title="Предупреждение"
+        description="Вы действительно хотите удалить тест?"
+      />
       <MainWrapper title={"Тесты"}>
         {isLoading ? (
           <div className="flex justify-center items-center flex-1 h-full">
@@ -43,7 +72,7 @@ const TeacherQuizzes = ({ quizzes }) => {
               </Link>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 items-start">
               {data.map((quiz) => (
                 <QuizCardTeacher
                   key={quiz.id}
@@ -55,6 +84,8 @@ const TeacherQuizzes = ({ quizzes }) => {
                   endDate={quiz.endDate}
                   slug={quiz.slug}
                   questions={quiz?.questions_func?.count}
+                  setTempId={setTempId}
+                  setOpen={setOpen}
                 />
               ))}
             </div>

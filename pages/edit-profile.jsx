@@ -285,4 +285,8 @@ export async function getServerSideProps(ctx) {
   return { props: { currentUser } };
 }
 
+EditProfile.auth = {
+	auth: 'required'
+}
+
 export default EditProfile;

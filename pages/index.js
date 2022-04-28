@@ -1,11 +1,8 @@
 import MainWrapper from "@/components/MainWrapper";
 import WeatherComponent from "@/components/Weather/WeatherComponent";
-import { useSession } from "next-auth/react";
 import Head from "next/head";
 
-export default function Home() {
-  const { data: session, status } = useSession();
-
+const Home = () => {
   return (
     <>
       <Head>
@@ -16,4 +13,10 @@ export default function Home() {
       </MainWrapper>
     </>
   );
-}
+};
+
+Home.auth = {
+  auth: "required",
+};
+
+export default Home;

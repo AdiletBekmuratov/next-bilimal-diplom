@@ -136,7 +136,10 @@ export const getTeacherQuizzes = async (accessToken) => {
     );
     const query = gql`
       query QuizTeacher {
-        Quiz(filter: { user_created: { id: { _in: "$CURRENT_USER" } } }) {
+        Quiz(
+          filter: { user_created: { id: { _in: "$CURRENT_USER" } } }
+          sort: ["-date_created"]
+        ) {
           id
           title
           description
@@ -452,6 +455,31 @@ export const deleteQuestionsByIds = async (values, accessToken) => {
     const res = await graphQLClient.request(query, values);
     console.log("Delete", { res });
     return res.delete_Question_items;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
+export const deleteQuizById = async (values, accessToken) => {
+  try {
+    const graphQLClient = new GraphQLClient(
+      `${process.env.NEXT_PUBLIC_API_URL}/graphql`,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+    const query = gql`
+      mutation DeleteQuizById($id: ID!) {
+        delete_Quiz_item(id: $id) {
+          id
+        }
+      }
+    `;
+    const res = await graphQLClient.request(query, values);
+    console.log("Delete", { res });
+    return res.delete_Quiz_item;
   } catch (error) {
     throw new Error(error);
   }
