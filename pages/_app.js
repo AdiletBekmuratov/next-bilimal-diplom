@@ -17,7 +17,7 @@ function MyApp({ Component, pageProps: { session, ...pageProps } }) {
       <Head>
         <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
       </Head>
-      <SessionProvider session={session} refetchInterv={interval}>
+      <SessionProvider session={session} refetchInterval={interval}>
         <QueryClientProvider client={queryClient}>
           <Toaster position="top-right" />
           {Component.auth ? (

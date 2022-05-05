@@ -478,8 +478,37 @@ export const deleteQuizById = async (values, accessToken) => {
       }
     `;
     const res = await graphQLClient.request(query, values);
-    console.log("Delete", { res });
     return res.delete_Quiz_item;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
+export const getNews = async (accessToken) => {
+  try {
+    const graphQLClient = new GraphQLClient(
+      `${process.env.NEXT_PUBLIC_API_URL}/graphql`,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+    const query = gql`
+      query GetNews {
+        News(
+          filter: { status: { _eq: "published" } }
+          sort: ["-date_created"]
+        ) {
+          id
+          title
+          body
+          date_created
+        }
+      }
+    `;
+    const res = await graphQLClient.request(query);
+    return res.News;
   } catch (error) {
     throw new Error(error);
   }
